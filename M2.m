@@ -91,7 +91,7 @@ t1=clock;
 t2=clock;
 
 Time1(k) = etime(t2,t1)
-[Mean Variance] = Kriging_predictor(xtest,Kriging_Model);
+[Mean Variance Covariance] = Kriging_predictor(xtest,Kriging_Model);
 MSE1(k)  = mean((Mean-y1).^2)/var(y1)
 
 %% Sliced GE-Kriging 

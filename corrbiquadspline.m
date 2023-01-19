@@ -5,8 +5,12 @@ function R_gek = corrbiquadspline(x,theta,dim,grad)
 %% Initialise
 
 [m n] = size(x);
-R_gek = zeros(m*(1+dim));
 
+if strcmp(grad,'off')
+   R_gek = zeros(m);
+else
+   R_gek = zeros(m*(1+dim));
+end
 %% The standard kriging correlation matrix for all samples
 
 mzmax = m*(m-1)/2;          % number of non-zero distances
@@ -89,27 +93,45 @@ end
 
 for i = 1:dim
       j = i;
-      ddr = zeros(mn,1);
-      if  ~isempty(i1)
-          ddr(i1) = -(-30 + 210*xi(i1) - 585/2*xi(i1).^2).*theta(i)^2;
+    %  ddr = zeros(mn,1);
+    %  if  ~isempty(i1)
+    %      ddr(i1) = -(-30 + 210*xi(i1) - 585/2*xi(i1).^2).*theta(i)^2;
+    %  end
+    %  if  ~isempty(i2)
+    %      ddr(i2) = -(20 - 40*xi(i2) + 20*xi(i2).^2).*theta(i)^2;
+    %  end
+    %      ii = 1 : m1;
+    %  for  k = 1 : dim
+    %      sj = ss(:,k);  ss(:,k) = ddr(ii);
+    %       ddr(ii) = prod(ss,2);
+
+    %      ss(:,k) = sj;   ii = ii + m1;
+    %  end 
+      
+      ddr = zeros(m1,1); xj = abs(d(:,j)).*theta(j);
+ 
+      i3 = find(xj <= 0.4);
+      i4 = find(0.4 < xj & xj < 1);
+ 
+      if  ~isempty(i3)
+           ddr(i3) = -(-30 + 210*xj(i3) - 585/2*xj(i3).^2).*theta(i)^2;
       end
-      if  ~isempty(i2)
-          ddr(i2) = -(20 - 40*xi(i2) + 20*xi(i2).^2).*theta(i)^2;
+      if  ~isempty(i4)
+           ddr(i4) = -(20 - 40*xj(i4) + 20*xj(i4).^2).*theta(i)^2;
       end
-          ii = 1 : m1;
-      for  k = 1 : dim
-          sj = ss(:,k);  ss(:,k) = ddr(ii);
-          ddr(ii) = prod(ss,2);
-          ss(:,k) = sj;   ii = ii + m1;
-      end
-          ddr = reshape(ddr,m1,n);
-          Sparse_mat = sparse([ij(:,1); o], [ij(:,2); o],[ddr(:,i); 30*theta(i)^2.*(ones(m,1)+mu)]); 
-          R_gek(m*i+1:m*(i+1),m*j+1:m*(j+1)) = Sparse_mat ;  
+
+       sj = ss(:,j);  ss(:,j) = ddr;
+       ddr = prod(ss,2);
+       ss(:,j) = sj;  
+       Sparse_mat = sparse([ij(:,1); o], [ij(:,2); o],[ddr; 30*theta(i)^2.*(ones(m,1)+mu)]); 
+       R_gek(m*i+1:m*(i+1),m*j+1:m*(j+1)) = Sparse_mat; 
+
 end
 
 
 for i = 1:dim
    for j = i+1:dim 
+
           sj = ss(:,j);  si=ss(:,i); 
           ss(:,j) = dr((j-1)*m1+1:j*m1); ss(:,i) = -dr((i-1)*m1+1:i*m1);
           dr2 = prod(ss,2);

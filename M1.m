@@ -30,7 +30,7 @@ for k = 1: 5
  
 x = [];
 
-N = Samplesize(k);  N1=5000;   % sample size
+N = Samplesize(k);  N1=100;   % sample size
 
 n=8;   % input dimension
 
@@ -83,7 +83,7 @@ t1=clock;
 t2=clock;
 
 Time(k) = etime(t2,t1)
-[Mean Variance] = GEKriging_predictor(xtest,GEKriging_Model);  % making prediction
+[Mean Variance ] = GEKriging_predictor(xtest,GEKriging_Model);  % making prediction
 MSE(k)  = mean((Mean-y1).^2)/var(y1)
 
 %% Kriging
@@ -103,7 +103,7 @@ t1=clock;
 t2=clock;
 
 Time1(k) = etime(t2,t1)
-[Mean Variance] = Kriging_predictor(xtest,Kriging_Model);
+[Mean Variance Covariance] = Kriging_predictor(xtest,Kriging_Model);
 MSE1(k)  = mean((Mean-y1).^2)/var(y1)
 
 %% Sliced GE-Kriging 

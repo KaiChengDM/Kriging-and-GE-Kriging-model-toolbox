@@ -6,7 +6,7 @@ Sliced gradient-enhanced Kriging surrogate model and corresponding Bayesian opti
 
 Kriging model and corresponding Bayesian optimization algorithm
 
-
+The code is deveoped by Kai Cheng. 
 
 Sliced gradient-enhanced Kriging surrogate model is developed based on the following paper:
 

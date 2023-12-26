@@ -10,6 +10,5 @@ The code is deveoped by Kai Cheng.
 
 Sliced gradient-enhanced Kriging surrogate model is developed based on the following paper:
 
-Cheng, Kai, and Ralf Zimmermann. "Sliced Gradient-Enhanced Kriging for High-Dimensional Function Approximation and Aerodynamic Modeling." https://arxiv.org/abs/2204.03562
-
+Cheng, Kai, and Ralf Zimmermann. "Sliced Gradient-Enhanced Kriging for High-Dimensional Function Approximation." SIAM Journal on Scientific Computing 45.6 (2023): A2858-A2885.
 

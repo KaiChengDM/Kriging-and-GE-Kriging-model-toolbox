@@ -1,6 +1,6 @@
 function model = Kriging_fit(inputpar,hyperpar)   
 
-% Training a gradient-enhanced Kriging model
+% Training a Kriging model with constant mean
 
 %%  Preparation
 
@@ -14,7 +14,7 @@ opt_algorithm = hyperpar.opt_algorithm;
 x      = inputpar.x;
 y      = inputpar.y;
 
-[m n] = size(x);               % number of design sites and their dimension     
+[m, n] = size(x);               % number of design sites and their dimension     
 
 dim = n;  mn = m; 
 
@@ -27,6 +27,8 @@ u = (x-repmat(lb_input,m,1))./(repmat(ub_input,m,1)-repmat(lb_input,m,1));   % N
 y = (y-repmat(mean_output,m,1))./repmat(std_output,m,1);  % Normalization of output data
 f = ones(m,1);   
  
+nugget = 10^-10*eye(m);
+
 input_bound   = [lb_input; ub_input];  % Input bound
 output_moment = [mean_output; std_output]; % Output moment
 
@@ -73,67 +75,34 @@ end
  
  corrmat  = feval(corr_fun,u,model.theta,dim,'off');
 
- [upper_mat rd]  = chol(corrmat);        % Full correlation matrix 
+ [C, rd]  = chol(corrmat+nugget);  CT = C';      % Full correlation matrix 
 
- model.upper_mat = upper_mat;
+ model.upper_mat = C;
  model.corrmat   = corrmat;
 
- beta0  = f'*(upper_mat\(upper_mat'\y))/sum((upper_mat\f).^2);
- sigma2 = sum((upper_mat'\(y-beta0*f)).^2)/mn;
+ beta0  = f'*(C\(CT\y))/sum((CT\f).^2);
+ sigma2 = sum((CT\(y-beta0*f)).^2)/mn;
 
  model.beta0  = beta0;
  model.sigma2 = sigma2;
 
-%% Likelihood function
+ %% Likelihood function
 
-% function Likelihood = GEKriging_likelihood(theta) 
-%     
-%  reduced_corrmat = Corrmat_chol(model,theta);    %  Matrix inversion with cholesky
-%     
-%  [tran_mat{1} rd(1)] = chol(reduced_corrmat(1:m,1:m));
-%  
-%  det(1) = prod(diag(tran_mat{1}).^(2/(m+m*dim)));
-%  
-%  f = ones(m,1);  yt = y;
-%  beta0 = f'*(tran_mat{1}\(tran_mat{1}'\yt))/(f'*(tran_mat{1}\(tran_mat{1}'\f)));
-% 
-%  sig(1) = (yt-beta0*f)'*(tran_mat{1}\(tran_mat{1}'\(yt-beta0*f)))/(m+m*dim);
-%  
-%   
-%  for i = 1 : dim
-%        
-%    [tran_mat{i+1} rd(i+1)] = chol(reduced_corrmat(m*i+1:(i+1)*m,m*i+1:(i+1)*m));
-%     
-%    det(i+1) = prod(diag(tran_mat{i+1}).^(2/(m+m*dim))); 
-%    
-%    grad_d = grad_f(:,dim); yt = grad_d;
-%    
-%    sig(i+1) = yt'*(tran_mat{i+1}\(tran_mat{i+1}'\yt))/(m+m*dim);
-% 
-%  end 
-%  
-%   sigma2 = sum (sig);
-%   
-%   Likelihood = sigma2*prod(det);  % likelihood function of weighted krging model
-% 
-%   model.upper_mat = tran_mat;
-% 
-% end
-%% Likelihood function 2
-
-function Likelihood = GEKriging_likelihood(theta) 
+function Likelihood = Kriging_likelihood(theta) 
 
   corrmat  = feval(corr_fun,u,theta,dim,'off');
 
-  [upper_mat rd] = chol(corrmat);
+  [C, rd] = chol(corrmat+nugget); CT = C';
                         
-  beta0 = f'*(upper_mat\(upper_mat'\y))/sum((upper_mat\f).^2);
+  beta0 = f'*(C\(CT\y))/sum((CT\f).^2);
   
-  sigma2 = sum((upper_mat'\(y-beta0*f)).^2)/mn;
+  sigma2 = sum((CT\(y-beta0*f)).^2)/mn;
 
-  detR = prod(diag(upper_mat).^(2/mn));  
+  % detR = prod(diag(upper_mat).^(2/mn));  
 
-  Likelihood = sigma2*detR;  % likelihood function of weighted krging model
+  % Likelihood = sigma2*detR;  % likelihood function of weighted krging model
+  
+  Likelihood = mn*log(sigma2)+2*sum(log(diag(C)));
 
 end
 
@@ -176,7 +145,7 @@ end
 ne  =  find(D ~=  1);
 
 % Check starting point and initialize performance info
-[f]  =  GEKriging_likelihood(t);   nv  =  1;
+[f]  =  Kriging_likelihood(t);   nv  =  1;
 itpar  =  struct('D',D, 'ne',ne, 'lo',lo, 'up',up, ...
   'perf',zeros(p+2,200*p), 'nv',1);
 itpar.perf(:,1)  =  [t; f; 1];
@@ -194,7 +163,7 @@ if  length(ng) > 1  % Try to improve starting guess
     v  =  DD .^ alpha;   tk  =  th;
     for  rept  =  1 : 4
       tt  =  tk .* v; 
-      [ff ]  =  GEKriging_likelihood(tt);  nv  =  nv+1;
+      [ff ]  =  Kriging_likelihood(tt);  nv  =  nv+1;
       itpar.perf(:,nv)  =  [tt; ff; 1];
       if  ff <=  fk 
         tk  =  tt;  fk  =  ff;
@@ -232,7 +201,7 @@ for  k  =  1 : length(ne)
     atbd  =  0;  tt(j)  =  min(itpar.up(j), t(j)*DD);
   end
 %   [ff  fitt]  =  objfunc(tt,par);  nv  =  nv+1;
-[ff]  =  GEKriging_likelihood(tt);  nv  =  nv+1;
+[ff]  =  Kriging_likelihood(tt);  nv  =  nv+1;
   itpar.perf(:,nv)  =  [tt; ff; 2];
   if  ff < f
     t  =  tt;  f  =  ff; 
@@ -241,7 +210,7 @@ for  k  =  1 : length(ne)
     if  ~atbd  % try decrease
       tt(j)  =  max(itpar.lo(j), t(j)/DD);
 %       [ff  fitt]  =  objfunc(tt,par);  nv  =  nv+1;
-        [ff ]  = GEKriging_likelihood(tt);  nv  =  nv+1;   
+        [ff ]  = Kriging_likelihood(tt);  nv  =  nv+1;   
       itpar.perf(:,nv)  =  [tt; ff; 2];
       if  ff < f
         t  =  tt;  f  =  ff; 
@@ -271,7 +240,7 @@ rept  =  1;
 while  rept
   tt  =  min(itpar.up, max(itpar.lo, t .* v));  
 %   [ff  fitt]  =  objfunc(tt,par);  nv  =  nv+1;
-  [ff ]  =  GEKriging_likelihood(tt);  nv  =  nv+1;
+  [ff ]  =  Kriging_likelihood(tt);  nv  =  nv+1;
   itpar.perf(:,nv)  =  [tt; ff; 3];
   if  ff < f
     t  =  tt;  f  =  ff;  

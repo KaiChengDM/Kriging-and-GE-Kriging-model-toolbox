@@ -69,7 +69,7 @@ t1=clock;
 t2=clock;
 
 Time(k) = etime(t2,t1)
-[Mean Variance] = GEKriging_predictor(xtest,GEKriging_Model);
+[Mean, Var] = GEKriging_predictor(xtest,GEKriging_Model);
 MSE(k)  = mean((Mean-y1).^2)/var(y1)
 
 %% Kriging
@@ -90,7 +90,7 @@ t1=clock;
 t2=clock;
 
 Time1(k) = etime(t2,t1)
-[Mean Variance] = Kriging_predictor(xtest,Kriging_Model);
+[Mean, Var] = Kriging_predictor(xtest,Kriging_Model);
 MSE1(k)  = mean((Mean-y1).^2)/var(y1)
 
 %% Sliced GE-Kriging 
@@ -114,7 +114,7 @@ t1 = clock;
 t2 = clock;
 
 Time2(k) = etime(t2,t1)
-[Mean Variance] = GEKriging_predictor(xtest,GEKriging_Model2);
+[Mean, Var] = GEKriging_predictor(xtest,GEKriging_Model2);
 MSE2(k) = mean((Mean-y1).^2)/var(y1)
 
 t1 = clock;
@@ -122,7 +122,7 @@ t1 = clock;
 t2 = clock;
 
 Time3(k) = etime(t2,t1)
-[Mean Variance] = GEKriging_predictor(xtest,GEKriging_Model3);
+[Mean, Var] = GEKriging_predictor(xtest,GEKriging_Model3);
 MSE3(k) = mean((Mean-y1).^2)/var(y1)
 
 end

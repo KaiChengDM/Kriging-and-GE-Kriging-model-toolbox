@@ -145,16 +145,17 @@ end
  theta = beta(1).*ratio.^beta(2)+beta(3);
  corrmat  = feval(corr_fun,u,theta,dim,'on');
  
- [upper_mat rd] = chol(corrmat);        %  Matrix inversion with cholesky
- model.upper_mat = upper_mat;
+ [C, rd] = chol(corrmat);  CT = C';      %  Matrix inversion with cholesky
+ 
+ model.upper_mat = C;
  model.corrmat   = corrmat;
  
  f  = [ones(m,1); zeros(m*dim,1)]; 
 
  yt = reshape(yt,m*(dim+1),1);
 
- beta0  = f'*(upper_mat\(upper_mat'\yt))/sum((upper_mat\f).^2);
- sigma2 = sum((upper_mat'\(yt-beta0*f)).^2)/mn;
+ beta0  = f'*(C\(CT\yt))/sum((CT\f).^2);
+ sigma2 = sum((CT\(yt-beta0*f)).^2)/mn;
  
  model.theta  = theta;
  model.beta0  = beta0;
@@ -176,7 +177,7 @@ function Likelihood = GEKriging_likelihood(beta)
 
      nom2(i) = f2{i}'*(upper_mat2{i}\(upper_mat2{i}'\y2{i})); 
      
-     denom2(i) = sum((upper_mat2{i}\f2{i}).^2);
+     denom2(i) = sum((upper_mat2{i}'\f2{i}).^2);
  end
  
  for i = 1 : snum-2
@@ -189,7 +190,7 @@ function Likelihood = GEKriging_likelihood(beta)
 
       nom1(i) = f1{i}'*(upper_mat1{i}\(upper_mat1{i}'\y1{i})); 
          
-      denom1(i) = sum((upper_mat1{i}\f1{i}).^2);
+      denom1(i) = sum((upper_mat1{i}'\f1{i}).^2);
   
  end
 

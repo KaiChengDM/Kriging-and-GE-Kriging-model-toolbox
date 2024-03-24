@@ -57,7 +57,7 @@ t2=clock;
 etime(t2,t1)
 
 Time = etime(t2,t1)
-[Mean Variance] = GEKriging_predictor(xtest,GEKriging_Model);
+[Mean, Var] = GEKriging_predictor(xtest,GEKriging_Model);
 MSE = mean((Mean-y1).^2)/var(y1)
 
 %% Training Sliced GE-Kriging
@@ -83,7 +83,7 @@ t2 = clock;
 etime(t2,t1)
 
 Time = etime(t2,t1)
-[Mean Variance] = GEKriging_predictor(xtest,GEKriging_Model1);
+[Mean, Var] = GEKriging_predictor(xtest,GEKriging_Model1);
 MSE1 = mean((Mean-y1).^2)/var(y1)
 
 % t1 = clock;

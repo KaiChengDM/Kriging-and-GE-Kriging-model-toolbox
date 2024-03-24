@@ -88,65 +88,30 @@ end
  model.likelihood = value;
 
  corrmat  = feval(corr_fun,u,model.theta,dim,'on');
- [upper_mat rd]  = chol(corrmat);        % Full correlation matrix 
+ [C, rd]  = chol(corrmat);  CT = C';       % Full correlation matrix 
 
- model.upper_mat = upper_mat;
+ model.upper_mat = C;
  model.corrmat   = corrmat;
 
- beta0  = f'*(upper_mat\(upper_mat'\yt))/sum((upper_mat\f).^2);
- sigma2 = sum((upper_mat'\(yt-beta0*f)).^2)/mn;
+ beta0  = f'*(C\(CT\yt))/sum((CT\f).^2);
+ sigma2 = sum((CT\(yt-beta0*f)).^2)/mn;
 
  model.beta0  = beta0;
  model.sigma2 = sigma2;
 
 %% Likelihood function
 
-% function Likelihood = GEKriging_likelihood(theta) 
-%     
-%  reduced_corrmat = Corrmat_chol(model,theta);    %  Matrix inversion with cholesky
-%     
-%  [tran_mat{1} rd(1)] = chol(reduced_corrmat(1:m,1:m));
-%  
-%  det(1) = prod(diag(tran_mat{1}).^(2/(m+m*dim)));
-%  
-%  f = ones(m,1);  yt = y;
-%  beta0 = f'*(tran_mat{1}\(tran_mat{1}'\yt))/(f'*(tran_mat{1}\(tran_mat{1}'\f)));
-% 
-%  sig(1) = (yt-beta0*f)'*(tran_mat{1}\(tran_mat{1}'\(yt-beta0*f)))/(m+m*dim);
-%  
-%   
-%  for i = 1 : dim
-%        
-%    [tran_mat{i+1} rd(i+1)] = chol(reduced_corrmat(m*i+1:(i+1)*m,m*i+1:(i+1)*m));
-%     
-%    det(i+1) = prod(diag(tran_mat{i+1}).^(2/(m+m*dim))); 
-%    
-%    grad_d = grad_f(:,dim); yt = grad_d;
-%    
-%    sig(i+1) = yt'*(tran_mat{i+1}\(tran_mat{i+1}'\yt))/(m+m*dim);
-% 
-%  end 
-%  
-%   sigma2 = sum (sig);
-%   
-%   Likelihood = sigma2*prod(det);  % likelihood function of weighted krging model
-% 
-%   model.upper_mat = tran_mat;
-% 
-% end
-%% Likelihood function 2
-
 function Likelihood = GEKriging_likelihood(theta) 
  
   corrmat  = feval(corr_fun,u,theta,dim,'on');
 
-  [upper_mat rd] = chol(corrmat);
+  [C, rd] = chol(corrmat); CT = C';
          
-  beta0 = f'*(upper_mat\(upper_mat'\yt))/sum((upper_mat\f).^2);
+  beta0 = f'*(C\(CT\yt))/sum((CT\f).^2);
   
-  sigma2 = sum((upper_mat'\(yt-beta0*f)).^2)/mn;
+  sigma2 = sum((CT\(yt-beta0*f)).^2)/mn;
 
-  Likelihood = mn*log(sigma2)+2*sum(log(diag(upper_mat)));
+  Likelihood = mn*log(sigma2)+2*sum(log(diag(C)));
   
 end
 

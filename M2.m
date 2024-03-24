@@ -74,8 +74,6 @@ Time(k) = etime(t2,t1)
 MSE(k)  = mean((Mean-y1).^2)/var(y1)
 
 %% Kriging
-
-
 hyperpar.theta = 0.1.*ones(1,n); 
 hyperpar.lb = 5*10^-4.*ones(1,n);
 hyperpar.ub = 5*ones(1,n);
@@ -91,7 +89,7 @@ t1=clock;
 t2=clock;
 
 Time1(k) = etime(t2,t1)
-[Mean Variance Covariance] = Kriging_predictor(xtest,Kriging_Model);
+[Mean, Variance] = Kriging_predictor(xtest,Kriging_Model);
 MSE1(k)  = mean((Mean-y1).^2)/var(y1)
 
 %% Sliced GE-Kriging 

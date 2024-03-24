@@ -55,7 +55,7 @@ t1=clock;
 t2=clock;
 
 Time2 = etime(t2,t1)
-[Mean Variance] = GEKriging_predictor(xtest,GEKriging_Model);
+[Mean, Var] = GEKriging_predictor(xtest,GEKriging_Model);
 MSE = mean((Mean-y1).^2)/var(y1)
 
 
@@ -78,6 +78,6 @@ t1=clock;
 t2=clock;
 
 Time1 = etime(t2,t1)
-[Mean Variance Covariance] = Kriging_predictor(xtest,Kriging_Model);
+[Mean, Var] = Kriging_predictor(xtest,Kriging_Model);
 MSE1  = mean((Mean-y1).^2)/var(y1)
 

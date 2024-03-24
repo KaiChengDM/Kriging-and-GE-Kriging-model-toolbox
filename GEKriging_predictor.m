@@ -1,4 +1,4 @@
-function [pred_mean pred_variance]= GEKriging_predictor(x_pre,model)  
+function [pred_mean, pred_variance]= GEKriging_predictor(x_pre,model)  
 
 % GE-Kriging model predictor
 
@@ -29,7 +29,7 @@ switch corr_fun
 
  %% Prediction
 
- upper_mat = model.upper_mat;
+ C = model.upper_mat; CT = C';
 
  f = [ones(m,1); zeros(m*dim,1)];   
  
@@ -39,11 +39,11 @@ switch corr_fun
 
  beta0 = model.beta0;   sigma2 = model.sigma2;
 
- mean = beta0+corrvector*(upper_mat\(upper_mat'\(yt-f*beta0))); % GE-Kriging prediction mean
+ mean = beta0+corrvector*(C\(CT\(yt-f*beta0))); % GE-Kriging prediction mean
 
- u = (corrvector*(upper_mat\(upper_mat'\f))-1)/(upper_mat\f);
+ u = (corrvector*(C\(CT\f))-1)/(CT\f);
 
- rt = upper_mat'\corrvector'; 
+ rt = CT\corrvector'; 
 
  variance =  sigma2*(1- sum(rt.^2) + sum(u'.^2))';
 % variance =  sigma2*(1- sum(rt.^2))';

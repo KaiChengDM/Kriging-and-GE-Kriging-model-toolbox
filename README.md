@@ -2,11 +2,26 @@
 
 Gradient-enhanced Kriging surrogate model and corresponding Bayesian optimization algorithm
 
-Sliced gradient-enhanced Kriging surrogate model and corresponding Bayesian optimization algorithm
+If you find this paper relevant to you, please cite
 
-Kriging model and corresponding Bayesian optimization algorithm
+@article{cheng2023sliced,
+  title={Sliced gradient-enhanced Kriging for high-dimensional function approximation},
+  author={Cheng, Kai and Zimmermann, Ralf},
+  journal={SIAM Journal on Scientific Computing},
+  volume={45},
+  number={6},
+  pages={A2858--A2885},
+  year={2023},
+  publisher={SIAM}
+}
 
-The package is deveoped by Kai Cheng based on paper:
-
-Cheng, Kai, and Ralf Zimmermann. "Sliced Gradient-Enhanced Kriging for High-Dimensional Function Approximation." SIAM Journal on Scientific Computing 45.6 (2023): A2858-A2885.
-
+@article{cheng2023gradient,
+  title={Gradient-enhanced Kriging for high-dimensional Bayesian optimization with linear embedding},
+  author={Cheng, Kai and Zimmermann, Ralf},
+  journal={AIAA Journal},
+  volume={61},
+  number={11},
+  pages={4946--4959},
+  year={2023},
+  publisher={American Institute of Aeronautics and Astronautics}
+}
